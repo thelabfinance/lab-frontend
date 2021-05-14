@@ -1,0 +1,67 @@
+[
+    {
+        "inputs": [
+            { "internalType": "contract IBEP20", "name": "_laboToken", "type": "address" },
+            { "internalType": "contract MasterChefV2", "name": "_chef", "type": "address" },
+            { "internalType": "address", "name": "_feeBurnAddress", "type": "address" },
+            { "internalType": "address", "name": "_laboTeam", "type": "address" },
+            { "internalType": "address", "name": "_nftSplitter", "type": "address" },
+            { "internalType": "uint8", "name": "_laboTeamPercent", "type": "uint8" },
+            { "internalType": "uint8", "name": "_laboBurnPercent", "type": "uint8" },
+            { "internalType": "uint8", "name": "_laboTeamDepositPercent", "type": "uint8" },
+            { "internalType": "uint8", "name": "_depositFeeBurnPercent", "type": "uint8" }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    { "inputs": [], "name": "depositFeeBurnPercent", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "feeBurnAddress", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboBurnPercent", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboTeam", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboTeamDepositPercent", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboTeamPercent", "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "laboToken", "outputs": [{ "internalType": "contract IBEP20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "nftSplitter", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "contract IBEP20[]", "name": "tokens", "type": "address[]" }], "name": "processAll", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [], "name": "processLabo", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "contract IBEP20", "name": "token", "type": "address" }], "name": "processToken", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "newChefDevAddress", "type": "address" }], "name": "setChefDevAddress", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "newChefFeeAddress", "type": "address" }], "name": "setChefFeeAddress", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "uint8", "name": "newDepositFeeBurnPercent", "type": "uint8" },
+            { "internalType": "uint8", "name": "newDepositFeeTeamPercent", "type": "uint8" }
+        ],
+        "name": "setDepositFeePercents",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [{ "internalType": "address", "name": "newFeeBurnAddress", "type": "address" }], "name": "setFeeBurnAddress", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "uint8", "name": "newLaboBurnPercent", "type": "uint8" },
+            { "internalType": "uint8", "name": "newLaboTeamPercent", "type": "uint8" }
+        ],
+        "name": "setLaboPercents",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [{ "internalType": "address", "name": "newLaboTeamAddress", "type": "address" }], "name": "setLaboTeamAddress", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "newNftSplitter", "type": "address" }], "name": "setNftSplitter", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "contract IBEP20", "name": "token", "type": "address" }], "name": "tokenBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+]
