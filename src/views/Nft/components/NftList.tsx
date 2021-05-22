@@ -93,10 +93,10 @@ const NftList = () => {
         <ToggleText>Show Owned only</ToggleText>
       </ToggleWrapper>
       <Features>
-          <Feature>
+          {/* <Feature>
             <FaExclamationTriangle /><br />
             <p>Only bid for already distributed NFTs <span style={{"color": "#0073ff"}}>(ids.: 7, 8, 11, 17, 22)</span>. </p>
-          </Feature>
+          </Feature> */}
           <Feature>
             <FaInfoCircle /><br />
             <p>To cancel a bid, hit <span style={{"color": "#0073ff"}}><FaTrashAlt style={{"fill": "#0073ff"}} /> delete</span> in the <i>get this NFT</i> popup.</p>
