@@ -102,7 +102,7 @@ export const usePriceBnbBusd = (): BigNumber => {
 // fetch(url, opts)
 //   .then(response => response.json())
 //   .then(json => {
-//     console.log(json.data.ethereum.address[0].balances);
+//     if (process.env.REACT_APP_DEBUG) console.log(json.data.ethereum.address[0].balances);
 //   })
 //   .catch(console.error);
 

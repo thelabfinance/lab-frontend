@@ -73,7 +73,7 @@ const NftList = () => {
     return null
   })
 
-  console.log(ownedNfts, 'owned nfts')
+  if (process.env.REACT_APP_DEBUG) console.log(ownedNfts, 'owned nfts')
 
   const addIncrement = () => {
     fullList.slice(displayList.length, displayList.length + increment).map((item)=>{
@@ -84,7 +84,7 @@ const NftList = () => {
     })
   }
 
-  console.log(displayList, 'display list')
+  if (process.env.REACT_APP_DEBUG) console.log(displayList, 'display list')
   
   return (
     <>

@@ -96,14 +96,14 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
   const userHasBid = Boolean(userBid)
   const isHighestBidder = ( highestBidder && account ? (highestBidder.toUpperCase() === account.toUpperCase()) : null )
 
-  console.log(`${userBid} user bid for nft ${nft.bunnyId}`)
+  if (process.env.REACT_APP_DEBUG) console.log(`${userBid} user bid for nft ${nft.bunnyId}`)
 
 
   const handleConfirm = async () => {
     try {
       if (!isOwner) {
-        console.log(`${value} BID BNB FOR NFT ${nft.bunnyId} FROM ${account}`)
-        console.log(nftSaleContract.methods, 'nft sale methods')
+        if (process.env.REACT_APP_DEBUG) console.log(`${value} BID BNB FOR NFT ${nft.bunnyId} FROM ${account}`)
+        if (process.env.REACT_APP_DEBUG) console.log(nftSaleContract.methods, 'nft sale methods')
         const bidPrice = (Number(value)*(10**18)).toString()
         await nftSaleContract.methods
         .bid(nft.bunnyId).send({
@@ -114,7 +114,7 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
         })
       }else{
         const salePrice = (Number(value)*(10**18)).toString()
-        console.log(typeof salePrice, 'type of sale price')
+        if (process.env.REACT_APP_DEBUG) console.log(typeof salePrice, 'type of sale price')
         await nftSaleContract.methods
         .putOnSale(nft.bunnyId, salePrice).send({
           from: account,
@@ -194,7 +194,7 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
     }
   }
 
-  console.log(Object(tradingData).OwnerPrice, 'trading data on modal')
+  if (process.env.REACT_APP_DEBUG) console.log(Object(tradingData).OwnerPrice, 'trading data on modal')
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const { value: inputValue } = evt.target
