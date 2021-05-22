@@ -89,7 +89,7 @@ const Farms: React.FC<FarmsProps> = (farmsProps) => {
   const handleModal = async () => {
     setModalOpen(!modalOpen)
   }  
-  if (process.env.REACT_APP_DEBUG) console.log(cakePrice, "testingg cakePrice");
+  if (process.env.REACT_APP_DEBUG === "true") console.log(cakePrice, "testingg cakePrice");
 
   const dispatch = useDispatch()
   const { fastRefresh } = useRefresh()
@@ -126,7 +126,7 @@ const Farms: React.FC<FarmsProps> = (farmsProps) => {
 
         let totalValue = new BigNumber(farm.lpTotalInQuoteToken || 0);
 
-        if (process.env.REACT_APP_DEBUG) console.log(farm.poolWeight, 'hey')
+        if (process.env.REACT_APP_DEBUG === "true") console.log(farm.poolWeight, 'hey')
 
         if (farm.quoteTokenSymbol === QuoteToken.BNB) {
           totalValue = totalValue.times(bnbPrice);

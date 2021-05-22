@@ -385,7 +385,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             priceOf[String(lpTokens[0])], 
             priceOf[String(lpTokens[1])]
           ] )
-          if (process.env.REACT_APP_DEBUG) console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+          if (process.env.REACT_APP_DEBUG === "true") console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
           const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
           const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
           const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
@@ -435,7 +435,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             highestBidder
           })
         } catch (error) {
-          if (process.env.REACT_APP_DEBUG) console.log(error, nftSaleContract, 'klk')
+          if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
           return 0
         }
       }
@@ -448,7 +448,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
       const tradingDataList = await Promise.all(tradingDataPromises)
       tradingData = tradingDataList
 
-      if (process.env.REACT_APP_DEBUG) console.log(tradingData, 'klk')
+      if (process.env.REACT_APP_DEBUG === "true") console.log(tradingData, 'klk')
 
 
       setState((prevState) => ({
@@ -472,7 +472,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const devFeeProcessorContract = getDevFeeProcessorContract()
         const nftSaleContract = getNftSaleContract()
 
-        if (process.env.REACT_APP_DEBUG) console.log([
+        if (process.env.REACT_APP_DEBUG === "true") console.log([
           pancakeRabbitsContract,
           rewardSplitterContract,
           devFeeProcessorContract,
@@ -493,10 +493,10 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const getOwnerOf = async (bunnyId: number) => {
           try {
             const ownerOf = await pancakeRabbitsContract.methods.ownerOf(bunnyId).call()
-            if (process.env.REACT_APP_DEBUG) console.log(ownerOf, 'owner of')
+            if (process.env.REACT_APP_DEBUG === "true") console.log(ownerOf, 'owner of')
             return ownerOf
           } catch (error) {
-            if (process.env.REACT_APP_DEBUG) console.log('owner')
+            if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
             return ""
           }
         }      
@@ -509,21 +509,21 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const ownersList = await Promise.all(ownersPromises)
         ownerMap = ownersList
 
-        if (process.env.REACT_APP_DEBUG) console.log(ownerMap, 'owner map')
+        if (process.env.REACT_APP_DEBUG === "true") console.log(ownerMap, 'owner map')
 
         // GET APPROVED ARRAY
 
         const getApprovedFor = async (bunnyId: number) => {
           try {
             const approvedFor = await pancakeRabbitsContract.methods.getApproved(bunnyId).call()
-            if (process.env.REACT_APP_DEBUG) console.log(approvedFor, `approved for ${bunnyId}`)
+            if (process.env.REACT_APP_DEBUG === "true") console.log(approvedFor, `approved for ${bunnyId}`)
             return approvedFor
           } catch (error) {
-            if (process.env.REACT_APP_DEBUG) console.log('owner')
+            if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
             return ""
           }
         }      
-        if (process.env.REACT_APP_DEBUG) console.log('heeey')
+        if (process.env.REACT_APP_DEBUG === "true") console.log('heeey')
         const approvedPromises = []
         for (let i = 1; i <= Nft.length; i++) {
           approvedPromises.push(getApprovedFor(i))
@@ -532,7 +532,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const approvedList = await Promise.all(approvedPromises)
         approvedMap = approvedList
 
-        if (process.env.REACT_APP_DEBUG) console.log(approvedMap, 'approved map')
+        if (process.env.REACT_APP_DEBUG === "true") console.log(approvedMap, 'approved map')
 
 
         // GET BALANCES ARRAY
@@ -549,7 +549,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
               priceOf[String(lpTokens[0])], 
               priceOf[String(lpTokens[1])]
             ] )
-            if (process.env.REACT_APP_DEBUG) console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+            if (process.env.REACT_APP_DEBUG === "true") console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
             const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
             const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
             const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
@@ -594,7 +594,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
           const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
 
-          if (process.env.REACT_APP_DEBUG) console.log(`${userBid} usser bid for nft ${bunnyId}`)
+          if (process.env.REACT_APP_DEBUG === "true") console.log(`${userBid} usser bid for nft ${bunnyId}`)
           return Object({
             OwnerPrice,
             isOnSale,
@@ -603,7 +603,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             userBid
           })
         } catch (error) {
-          if (process.env.REACT_APP_DEBUG) console.log(error, nftSaleContract, 'klk')
+          if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
           return 0
         }
       }
@@ -635,7 +635,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             try {
               const tokenId = await pancakeRabbitsContract.methods.tokenOfOwnerByIndex(account, index).call()
               const bunnyId = await pancakeRabbitsContract.methods.getBunnyId(tokenId).call()
-              if (process.env.REACT_APP_DEBUG) console.log(`${tokenId} token ID and ${bunnyId} bunny ID of account: ${account}`)
+              if (process.env.REACT_APP_DEBUG === "true") console.log(`${tokenId} token ID and ${bunnyId} bunny ID of account: ${account}`)
 
               return [parseInt(bunnyId, 10), parseInt(tokenId, 10)]
             } catch (error) {

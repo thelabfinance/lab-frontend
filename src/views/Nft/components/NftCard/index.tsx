@@ -154,7 +154,7 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
   }
 
   const balanceArray = Array(getBalances(nft.bunnyId))[0]
-  if (process.env.REACT_APP_DEBUG) console.log(balanceArray, 'balances')
+  if (process.env.REACT_APP_DEBUG === "true") console.log(balanceArray, 'balances')
   const laboBalance = ( balanceArray ? parseFloat(Object(balanceArray.filter(item => Object(item).tokenSymbol === "LABO")[0]).balance)/(10**18) : 0 )
 
   const owner = String(ownerOf(nft.bunnyId))

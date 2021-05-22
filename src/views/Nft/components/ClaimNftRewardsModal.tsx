@@ -146,21 +146,21 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
   const wbnbPrice = Number(usePriceBnbBusd())
   const farmsLP = useFarms().map((farm)=>{
     if(String(farm.quoteTokenSymbol) === 'BNB' ){
-      if (process.env.REACT_APP_DEBUG) console.log(`${wbnbPrice} wbnb price`)
+      if (process.env.REACT_APP_DEBUG === "true") console.log(`${wbnbPrice} wbnb price`)
       pricesMap[farm.lpSymbol] = Number(farm.tokenPriceVsQuote)*wbnbPrice
     }else{
       pricesMap[farm.lpSymbol] = Number(farm.tokenPriceVsQuote)
     }
     return farm
   })
-  if (process.env.REACT_APP_DEBUG) console.log(balances, 'testing balances in modal')
+  if (process.env.REACT_APP_DEBUG === "true") console.log(balances, 'testing balances in modal')
 
   const UpdateComponent = useForceUpdate()
 
   const handleClaim = async (address) => {
     try {
-      if (process.env.REACT_APP_DEBUG) console.log(rabbitMintingContract.methods, 'contract methods')
-      if (process.env.REACT_APP_DEBUG) console.log(`account address: ${account}, token address: ${address} and token ID: ${nft.bunnyId}`)
+      if (process.env.REACT_APP_DEBUG === "true") console.log(rabbitMintingContract.methods, 'contract methods')
+      if (process.env.REACT_APP_DEBUG === "true") console.log(`account address: ${account}, token address: ${address} and token ID: ${nft.bunnyId}`)
       await rabbitMintingContract.methods
         .release(address, nft.bunnyId).send({
           from: account
@@ -168,7 +168,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
           window.location.reload()
         })
         UpdateComponent()
-        if (process.env.REACT_APP_DEBUG) console.log('success')
+        if (process.env.REACT_APP_DEBUG === "true") console.log('success')
     } catch (err) {
       console.error('Unable to mint NFT:', err)
     }
@@ -202,7 +202,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
     }
   }, [cakeInWallet, setError])
 
-  if (process.env.REACT_APP_DEBUG) console.log(balances, "balances in modal")
+  if (process.env.REACT_APP_DEBUG === "true") console.log(balances, "balances in modal")
 
   return (
 
@@ -233,7 +233,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                   const tokenSymbol = balance.isTokenOnly ? balance.tokenSymbol : `${balance.tokenSymbol} LP`
                   const tokenPrice = Number(pricesMap[tokenSymbol])
 
-                  if (process.env.REACT_APP_DEBUG) console.log(` ${tokenPrice} token price for ${tokenSymbol} `)
+                  if (process.env.REACT_APP_DEBUG === "true") console.log(` ${tokenPrice} token price for ${tokenSymbol} `)
 
                   const processedBalance = (balance.balance/10**18).toFixed(6)
                   const usdtProcessedBalance = (balance.usdtBalance/10**18).toFixed(6)
@@ -312,7 +312,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                   const tokenSymbol = balance.isTokenOnly ? balance.tokenSymbol : `${balance.tokenSymbol} LP`
                   const tokenPrice = Number(pricesMap[tokenSymbol])
 
-                  if (process.env.REACT_APP_DEBUG) console.log(` price of ${tokenSymbol}: ${tokenPrice} `)
+                  if (process.env.REACT_APP_DEBUG === "true") console.log(` price of ${tokenSymbol}: ${tokenPrice} `)
 
                   const processedBalance = (balance.balance/10**18).toFixed(6)
                   const usdtProcessedBalance = (balance.usdtBalance/10**18).toFixed(6)
