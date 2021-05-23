@@ -252,13 +252,13 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                       <Td>
                         <FlexCol>
                           <span>{totalBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtTotalBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtTotalBalance}</span> */}
                         </FlexCol>
                       </Td>
                       <Td>
                         <FlexCol>
                           <span>{perNftBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span> */}
                         </FlexCol>
                       </Td>
                       <Td>
@@ -269,7 +269,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                       <Td>
                         <FlexCol>
                           <span>{processedBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span> */}
                         </FlexCol>
                       </Td>
                           { !viewMode ? 
@@ -331,13 +331,13 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                       <Td>
                         <FlexCol>
                           <span>{totalBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtTotalBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtTotalBalance}</span> */}
                         </FlexCol>
                       </Td>
                       <Td>
                         <FlexCol>
                           <span>{perNftBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span> */}
                         </FlexCol>
                       </Td>
                       <Td>
@@ -348,7 +348,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                       <Td>
                         <FlexCol>
                           <span>{processedBalance}</span>
-                          <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span>
+                          {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span> */}
                         </FlexCol>
                       </Td>
                           { !viewMode ? 
@@ -421,7 +421,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                             <TdSm>
                               <FlexCol>
                                 <span>{perNftBalance}</span>
-                                <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span>
+                                {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span> */}
                               </FlexCol>
                             </TdSm>
                           </tr>
@@ -438,7 +438,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                             <TdSm>
                               <FlexCol>
                                 <span>{processedBalance}</span>
-                                <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span>
+                                {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span> */}
                               </FlexCol>
                             </TdSm>
                           </tr>
@@ -515,7 +515,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                             <TdSm>
                               <FlexCol>
                                 <span>{perNftBalance}</span>
-                                <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span>
+                                {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtPerNftBalance}</span> */}
                               </FlexCol>
                             </TdSm>
                           </tr>
@@ -532,7 +532,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
                             <TdSm>
                               <FlexCol>
                                 <span>{processedBalance}</span>
-                                <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span>
+                                {/* <span style={{'color': '#aaa', 'fontWeight': 200, 'marginTop': '5px' }}>${usdtProcessedBalance}</span> */}
                               </FlexCol>
                             </TdSm>
                           </tr>

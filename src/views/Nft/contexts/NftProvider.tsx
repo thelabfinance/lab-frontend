@@ -370,7 +370,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
       let balancesMap: BalancesMap = {}
 
 
-      const priceOf = await getPrices()
+      // const priceOf = await getPrices()
 
 
       // GET BALANCES ARRAY
@@ -381,25 +381,25 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
           const nftRewards = (Number(totalRewards)*0.35)/50
           const lpTokens = tokenSymbol.split('-')
-          const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-            priceOf[String(lpTokens[0])], 
-            priceOf[String(lpTokens[1])]
-          ] )
-          if (process.env.REACT_APP_DEBUG === "true") console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-          const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-          const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-          const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
+          // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
+          //   priceOf[String(lpTokens[0])], 
+          //   priceOf[String(lpTokens[1])]
+          // ] )
+          // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+          // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
+          // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
+          // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
     
           return Object({
             currency: tokenAddr,
             balance,
-            usdtBalance,
+            // usdtBalance,
             tokenSymbol,
             isTokenOnly,
             totalRewards,
-            usdtTotalRewards,
+            // usdtTotalRewards,
             nftRewards,
-            usdtNftRewards
+            // usdtNftRewards
           })
         } catch (error) {
           return 0
@@ -537,7 +537,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
         // GET BALANCES ARRAY
 
-        const priceOf = await getPrices()
+        // const priceOf = await getPrices()
 
         const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
           try {
@@ -545,26 +545,26 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
             const nftRewards = (Number(totalRewards)*0.35)/50
             const lpTokens = tokenSymbol.split('-')
-            const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-              priceOf[String(lpTokens[0])], 
-              priceOf[String(lpTokens[1])]
-            ] )
-            if (process.env.REACT_APP_DEBUG === "true") console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-            const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-            const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-            const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
+            // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
+            //   priceOf[String(lpTokens[0])], 
+            //   priceOf[String(lpTokens[1])]
+            // ] )
+            // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+            // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
+            // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
+            // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
             
       
             return Object({
               currency: tokenAddr,
               balance,
-              usdtBalance,
+              // usdtBalance,
               tokenSymbol,
               isTokenOnly,
               totalRewards,
-              usdtTotalRewards,
+              // usdtTotalRewards,
               nftRewards,
-              usdtNftRewards
+              // usdtNftRewards
             })
           } catch (error) {
             return 0
