@@ -1,0 +1,140 @@
+[
+    { "inputs": [{ "internalType": "contract IERC721", "name": "_nft", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "price", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "Bid",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "BidRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "OffSale",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }], "name": "Paused", "type": "event" },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "price", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "PriceSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "indexed": false, "internalType": "address", "name": "seller", "type": "address" },
+            { "indexed": false, "internalType": "address", "name": "buyer", "type": "address" }
+        ],
+        "name": "Sold",
+        "type": "event"
+    },
+    { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }], "name": "Unpaused", "type": "event" },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "acceptBid",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "acceptHighestBid", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [{ "internalType": "address", "name": "by", "type": "address" }],
+        "name": "allBidsBy",
+        "outputs": [
+            { "internalType": "uint256[]", "name": "nftIds", "type": "uint256[]" },
+            { "internalType": "uint256[]", "name": "bidValues", "type": "uint256[]" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "allMyBids",
+        "outputs": [
+            { "internalType": "uint256[]", "name": "nftIds", "type": "uint256[]" },
+            { "internalType": "uint256[]", "name": "bidValues", "type": "uint256[]" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "bid", "outputs": [], "stateMutability": "payable", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "buy", "outputs": [], "stateMutability": "payable", "type": "function" },
+    { "inputs": [], "name": "cancelAllMyBids", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "cancelBid", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "internalType": "address", "name": "by", "type": "address" }
+        ],
+        "name": "getBidBy",
+        "outputs": [{ "internalType": "uint256", "name": "value", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "getHighestBid", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "getMyBid", "outputs": [{ "internalType": "uint256", "name": "value", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "getPrice", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "isOnSale", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "nft", "outputs": [{ "internalType": "contract IERC721", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [], "name": "paused", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "name": "perTokenBids", "outputs": [{ "internalType": "address", "name": "highestBidder", "type": "address" }], "stateMutability": "view", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" },
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "name": "prices",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "nftId", "type": "uint256" },
+            { "internalType": "uint256", "name": "price", "type": "uint256" }
+        ],
+        "name": "putOnSale",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "uint256", "name": "nftId", "type": "uint256" }], "name": "takeOffSale", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+]
