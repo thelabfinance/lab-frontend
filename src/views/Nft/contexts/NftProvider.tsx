@@ -90,6 +90,13 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
   const currentBlock = useBlock()
 
   const { isInitialized } = state
+  
+  const getNftData = async () => {
+    const nftData = await fetch('https://us-central1-thelabfinance-f96f8.cloudfunctions.net/readNftData')
+    const response = nftData.json()
+
+    return response
+  }
 
   const getPrices = async () =>{
     // GET PRICES
@@ -367,6 +374,8 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
       const devFeeProcessorContract = getDevFeeProcessorContract()
       const nftSaleContract = getNftSaleContract()
 
+      const nftData = await getNftData()
+
       let balancesMap: BalancesMap = {}
 
 
@@ -375,42 +384,74 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
       // GET BALANCES ARRAY
 
-      const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-        try {
-          const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-          const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
-          const nftRewards = (Number(totalRewards)*0.35)/50
-          const lpTokens = tokenSymbol.split('-')
-          // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-          //   priceOf[String(lpTokens[0])], 
-          //   priceOf[String(lpTokens[1])]
-          // ] )
-          // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-          // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-          // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-          // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
+      // const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
+      //   try {
+      //     const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
+      //     const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
+      //     const nftRewards = (Number(totalRewards)*0.35)/50
+      //     const lpTokens = tokenSymbol.split('-')
+      //     // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
+      //     //   priceOf[String(lpTokens[0])], 
+      //     //   priceOf[String(lpTokens[1])]
+      //     // ] )
+      //     // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+      //     // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
+      //     // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
+      //     // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
     
-          return Object({
-            currency: tokenAddr,
-            balance,
-            // usdtBalance,
-            tokenSymbol,
-            isTokenOnly,
-            totalRewards,
-            // usdtTotalRewards,
-            nftRewards,
-            // usdtNftRewards
-          })
-        } catch (error) {
-          return 0
+      //     return Object({
+      //       currency: tokenAddr,
+      //       balance,
+      //       // usdtBalance,
+      //       tokenSymbol,
+      //       isTokenOnly,
+      //       totalRewards,
+      //       // usdtTotalRewards,
+      //       nftRewards,
+      //       // usdtNftRewards
+      //     })
+      //   } catch (error) {
+      //     return 0
+      //   }
+      // }      
+
+      const getBalanceCloud = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
+        
+        const nftInstance = nftData.filter((nft)=>{
+          if (nft.nftId === bunnyId){
+            return nft
+          } 
+          return null
+        })[0]
+
+        // const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
+        const balanceInstance = nftInstance.balances.filter((balance)=>{
+          if (balance.address.toLowerCase() === tokenAddr.toLowerCase()){
+            return balance
+          }
+          return null
+        })[0]
+
+        const balance = balanceInstance.balance
+        const totalRewards = balanceInstance.totalRewards
+        const nftRewards = balanceInstance.nftRewards
+        // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
+        // const nftRewards = (Number(totalRewards)*0.35)/50
+        return {
+          nftInstance,
+          balance,
+          totalRewards,
+          nftRewards,
+          isTokenOnly,
+          tokenSymbol
         }
-      }      
+      }
 
       const balancesPromises = []
       for (let i = 1; i <= Nft.length; i++) {
         const balancePromises = []
         Object.keys(rewardsPools).forEach( async (key) => {
-          balancePromises.push(await getBalance(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
+          balancePromises.push(await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
         } )
         balancesPromises.push(balancePromises)
       }
@@ -422,33 +463,57 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
       let tradingData: TradingData = {}
 
-      const getTradingData = async (bunnyId: number) => {
-        try {
-          const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
-          const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
-          const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
-          const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
-          return Object({
-            OwnerPrice,
-            isOnSale,
-            highestBid,
-            highestBidder
-          })
-        } catch (error) {
-          if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
-          return 0
-        }
+      // const getTradingData = async (bunnyId: number) => {
+      //   try {
+      //     const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
+      //     const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
+      //     const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
+      //     const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
+      //     return Object({
+      //       OwnerPrice,
+      //       isOnSale,
+      //       highestBid,
+      //       highestBidder
+      //     })
+      //   } catch (error) {
+      //     if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
+      //     return 0
+      //   }
+      // }
+
+      const getTradingDataCloud = async (bunnyId: number) => {
+        const nftInstance = nftData.filter((nft)=>{
+          if (nft.nftId === bunnyId){
+            return nft
+          } 
+          return null
+        })[0]
+
+        const tradingDataInstance = nftInstance
+
+        const OwnerPrice = tradingDataInstance.OwnerPrice
+        const isOnSale = tradingDataInstance.isOnSale
+        const highestBid = tradingDataInstance.highestBid
+        const highestBidder = tradingDataInstance.highestBidder
+
+        return Object({
+          OwnerPrice,
+          isOnSale,
+          highestBid,
+          highestBidder
+        })
+       
       }
 
       const tradingDataPromises = []
       for (let i = 1; i <= Nft.length; i++) {
-        tradingDataPromises.push(getTradingData(i))
+        tradingDataPromises.push(getTradingDataCloud(i))
       }
 
       const tradingDataList = await Promise.all(tradingDataPromises)
       tradingData = tradingDataList
 
-      if (process.env.REACT_APP_DEBUG === "true") console.log(tradingData, 'klk')
+      if (process.env.REACT_APP_DEBUG === "true") console.log(tradingData, 'klk trading data')
 
 
       setState((prevState) => ({
@@ -472,6 +537,8 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const devFeeProcessorContract = getDevFeeProcessorContract()
         const nftSaleContract = getNftSaleContract()
 
+        const nftData = await getNftData()
+
         if (process.env.REACT_APP_DEBUG === "true") console.log([
           pancakeRabbitsContract,
           rewardSplitterContract,
@@ -490,20 +557,35 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
         // GET OWNER ARRAY
 
-        const getOwnerOf = async (bunnyId: number) => {
-          try {
-            const ownerOf = await pancakeRabbitsContract.methods.ownerOf(bunnyId).call()
-            if (process.env.REACT_APP_DEBUG === "true") console.log(ownerOf, 'owner of')
-            return ownerOf
-          } catch (error) {
-            if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
-            return ""
-          }
-        }      
+        // const getOwnerOf = async (bunnyId: number) => {
+        //   try {
+        //     const ownerOf = await pancakeRabbitsContract.methods.ownerOf(bunnyId).call()
+        //     if (process.env.REACT_APP_DEBUG === "true") console.log(ownerOf, 'owner of')
+        //     return ownerOf
+        //   } catch (error) {
+        //     if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
+        //     return ""
+        //   }
+        // }
+        
+        const getOwnerOfCloud = async (bunnyId: number) => {
+          const nftInstance = nftData.filter((nft)=>{
+            if (nft.nftId === bunnyId){
+              return nft
+            } 
+            return null
+          })[0]
+
+          const governanceDataInstance = nftInstance.governanceData
+
+          const ownerOf = governanceDataInstance.ownerOf
+
+          return ownerOf
+        }
 
         const ownersPromises = []
         for (let i = 1; i <= Nft.length; i++) {
-          ownersPromises.push(getOwnerOf(i))
+          ownersPromises.push(getOwnerOfCloud(i))
         }
 
         const ownersList = await Promise.all(ownersPromises)
@@ -513,20 +595,37 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
         // GET APPROVED ARRAY
 
-        const getApprovedFor = async (bunnyId: number) => {
-          try {
-            const approvedFor = await pancakeRabbitsContract.methods.getApproved(bunnyId).call()
-            if (process.env.REACT_APP_DEBUG === "true") console.log(approvedFor, `approved for ${bunnyId}`)
-            return approvedFor
-          } catch (error) {
-            if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
-            return ""
-          }
-        }      
-        if (process.env.REACT_APP_DEBUG === "true") console.log('heeey')
+        // const getApprovedFor = async (bunnyId: number) => {
+        //   try {
+        //     const approvedFor = await pancakeRabbitsContract.methods.getApproved(bunnyId).call()
+        //     if (process.env.REACT_APP_DEBUG === "true") console.log(approvedFor, `approved for ${bunnyId}`)
+        //     return approvedFor
+        //   } catch (error) {
+        //     if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
+        //     return ""
+        //   }
+        // }      
+        // if (process.env.REACT_APP_DEBUG === "true") console.log('heeey')
+    
+
+        const getApprovedForCloud = async (bunnyId: number) => {
+          const nftInstance = nftData.filter((nft)=>{
+            if (nft.nftId === bunnyId){
+              return nft
+            } 
+            return null
+          })[0]
+
+          const approvedDataInstance = nftInstance.approvedData
+
+          const approvedFor = approvedDataInstance.ownerOf
+
+          return approvedFor
+        }
+
         const approvedPromises = []
         for (let i = 1; i <= Nft.length; i++) {
-          approvedPromises.push(getApprovedFor(i))
+          approvedPromises.push(getApprovedForCloud(i))
         }
 
         const approvedList = await Promise.all(approvedPromises)
@@ -539,42 +638,75 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
         // const priceOf = await getPrices()
 
-        const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-          try {
-            const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-            const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
-            const nftRewards = (Number(totalRewards)*0.35)/50
-            const lpTokens = tokenSymbol.split('-')
-            // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-            //   priceOf[String(lpTokens[0])], 
-            //   priceOf[String(lpTokens[1])]
-            // ] )
-            // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-            // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-            // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-            // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
+        const getBalanceCloud = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
+        
+          const nftInstance = nftData.filter((nft)=>{
+            if (nft.nftId === bunnyId){
+              return nft
+            } 
+            return null
+          })[0]
+  
+          // const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
+          const balanceInstance = nftInstance.balances.filter((balance)=>{
+            if (balance.address.toLowerCase() === tokenAddr.toLowerCase()){
+              return balance
+            }
+            return null
+          })[0]
+  
+          const balance = balanceInstance.balance
+          const totalRewards = balanceInstance.totalRewards
+          const nftRewards = balanceInstance.nftRewards
+          // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
+          // const nftRewards = (Number(totalRewards)*0.35)/50
+          return {
+            nftInstance,
+            balance,
+            totalRewards,
+            nftRewards,
+            isTokenOnly,
+            tokenSymbol
+          }
+        }
+
+        // const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
+        //   try {
+        //     const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
+        //     const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
+        //     const nftRewards = (Number(totalRewards)*0.35)/50
+        //     const lpTokens = tokenSymbol.split('-')
+        //     // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
+        //     //   priceOf[String(lpTokens[0])], 
+        //     //   priceOf[String(lpTokens[1])]
+        //     // ] )
+        //     // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
+        //     // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
+        //     // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
+        //     // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
             
       
-            return Object({
-              currency: tokenAddr,
-              balance,
-              // usdtBalance,
-              tokenSymbol,
-              isTokenOnly,
-              totalRewards,
-              // usdtTotalRewards,
-              nftRewards,
-              // usdtNftRewards
-            })
-          } catch (error) {
-            return 0
-          }
-        }      
+        //     return Object({
+        //       currency: tokenAddr,
+        //       balance,
+        //       // usdtBalance,
+        //       tokenSymbol,
+        //       isTokenOnly,
+        //       totalRewards,
+        //       // usdtTotalRewards,
+        //       nftRewards,
+        //       // usdtNftRewards
+        //     })
+        //   } catch (error) {
+        //     return 0
+        //   }
+        // }      
+
         const balancesPromises = []
         for (let i = 1; i <= Nft.length; i++) {
           const balancePromises = []
           Object.keys(rewardsPools).forEach( async (key) => {
-            balancePromises.push(await getBalance(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
+            balancePromises.push(await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
           } )
           balancesPromises.push(balancePromises)
         }
@@ -586,31 +718,55 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
       let tradingData: TradingData = {}
 
-      const getTradingData = async (bunnyId: number) => {
-        try {
-          const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
-          const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
-          const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
-          const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
-          const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
+      const getTradingDataCloud = async (bunnyId: number) => {
+        const nftInstance = nftData.filter((nft)=>{
+          if (nft.nftId === bunnyId){
+            return nft
+          } 
+          return null
+        })[0]
 
-          if (process.env.REACT_APP_DEBUG === "true") console.log(`${userBid} usser bid for nft ${bunnyId}`)
-          return Object({
-            OwnerPrice,
-            isOnSale,
-            highestBid,
-            highestBidder,
-            userBid
-          })
-        } catch (error) {
-          if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
-          return 0
-        }
+        const tradingDataInstance = nftInstance
+
+        const OwnerPrice = tradingDataInstance.OwnerPrice
+        const isOnSale = tradingDataInstance.isOnSale
+        const highestBid = tradingDataInstance.highestBid
+        const highestBidder = tradingDataInstance.highestBidder
+
+        return Object({
+          OwnerPrice,
+          isOnSale,
+          highestBid,
+          highestBidder
+        })
+       
       }
+
+      // const getTradingData = async (bunnyId: number) => {
+      //   try {
+      //     const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
+      //     const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
+      //     const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
+      //     const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
+      //     const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
+
+      //     if (process.env.REACT_APP_DEBUG === "true") console.log(`${userBid} usser bid for nft ${bunnyId}`)
+      //     return Object({
+      //       OwnerPrice,
+      //       isOnSale,
+      //       highestBid,
+      //       highestBidder,
+      //       userBid
+      //     })
+      //   } catch (error) {
+      //     if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
+      //     return 0
+      //   }
+      // }
 
       const tradingDataPromises = []
       for (let i = 1; i <= Nft.length; i++) {
-        tradingDataPromises.push(getTradingData(i))
+        tradingDataPromises.push(getTradingDataCloud(i))
       }
 
       const tradingDataList = await Promise.all(tradingDataPromises)
