@@ -620,7 +620,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
           const approvedDataInstance = nftInstance.approvedData
 
-          const approvedFor = approvedDataInstance.ownerOf
+          const approvedFor = approvedDataInstance.approvedFor
 
           return approvedFor
         }
