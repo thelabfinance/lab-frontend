@@ -277,13 +277,17 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
                 )}
                 </>
               )}
-
+          
             <br />
-            <InfoRow>
-                <Text>Current Highest Bid:</Text>
-                <Value>{highestBid.toFixed(4)} BNB</Value>
-            </InfoRow>
-            <br />
+            {(!isOwner ? (
+              <>
+                <InfoRow>
+                    <Text>Current Highest Bid:</Text>
+                    <Value>{highestBid.toFixed(4)} BNB</Value>
+                </InfoRow>
+                <Separator>or</Separator>
+              </>
+            ):(<></>))}
             <InfoRow>
           {(
             isOwner ? 
@@ -310,6 +314,7 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
 
               {( userHasBid ? (
                  <>
+                  <br/>
                   <Text>Your Bid:</Text>
                   <Value>{userBid.toFixed(4)} BNB</Value>
                   <ReactTooltip id='catFace' type='info'>
@@ -326,7 +331,7 @@ const TransferNftModal: React.FC<TradeNftModalProps> = ({ nft, approvedAddress, 
             )
           
           )}
-        </InfoRow>
+          </InfoRow>
   
             <Label htmlFor="transferAddress">{( !isOwner ? 'Make a Bid' : 'Set New Price' )}</Label>
             {( isOwner ? (

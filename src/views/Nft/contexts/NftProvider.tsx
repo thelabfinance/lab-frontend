@@ -489,14 +489,16 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           return null
         })[0]
 
-        const tradingDataInstance = nftInstance
+        const tradingDataInstance = nftInstance.tradingData
 
-        const OwnerPrice = tradingDataInstance.OwnerPrice
+        const OwnerPrice = tradingDataInstance.ownerPrice
         const isOnSale = tradingDataInstance.isOnSale
         const highestBid = tradingDataInstance.highestBid
         const highestBidder = tradingDataInstance.highestBidder
+        
 
         return Object({
+          nftInstance,
           OwnerPrice,
           isOnSale,
           highestBid,
@@ -726,18 +728,22 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           return null
         })[0]
 
-        const tradingDataInstance = nftInstance
+        const tradingDataInstance = nftInstance.tradingData
 
-        const OwnerPrice = tradingDataInstance.OwnerPrice
+        const OwnerPrice = tradingDataInstance.ownerPrice
         const isOnSale = tradingDataInstance.isOnSale
         const highestBid = tradingDataInstance.highestBid
         const highestBidder = tradingDataInstance.highestBidder
 
+        const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
+
         return Object({
+          nftInstance,
           OwnerPrice,
           isOnSale,
           highestBid,
-          highestBidder
+          highestBidder,
+          userBid
         })
        
       }
