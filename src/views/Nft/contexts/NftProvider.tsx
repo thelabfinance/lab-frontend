@@ -438,6 +438,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
         // const nftRewards = (Number(totalRewards)*0.35)/50
         return {
+          currency: tokenAddr,
           nftInstance,
           balance,
           totalRewards,
@@ -663,6 +664,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
           // const nftRewards = (Number(totalRewards)*0.35)/50
           return {
+            currency: tokenAddr,
             nftInstance,
             balance,
             totalRewards,
