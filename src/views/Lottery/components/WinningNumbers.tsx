@@ -58,7 +58,7 @@ const WinningNumbers: React.FC = () => {
                 </CardImage>
               </RabbitBox>
             </RabbitRow>
-            <RabbitRowSmall>
+            {/* <RabbitRowSmall>
               <RabbitBoxSmall>
                 <CardImage>
                   <Image src="/images/hydroUtil.svg" alt="Number 1" width={200} height={150} responsive />
@@ -79,7 +79,7 @@ const WinningNumbers: React.FC = () => {
                   <Image src="/images/hydroUtil.svg" alt="Number 4" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBoxSmall>
-            </RabbitRowSmall>
+            </RabbitRowSmall> */}
             <Column>
               <RowNoPadding>
                 <CenteredTextWithPadding>{TranslateString(442, 'Tickets matching 4 numbers:')}</CenteredTextWithPadding>
@@ -100,7 +100,7 @@ const WinningNumbers: React.FC = () => {
                 </CenteredTextWithPadding>
               </RowNoPadding>
             </Column>
-            <Link href="https://api.pancakeswap.com/api/lottery?page=0&pageSize=25" target="_blank">
+            <Link href="https://gatsby-labo-api-jet.vercel.app/api/lottery?page=0&pageSize=25" target="_blank">
               {TranslateString(448, 'Export recent winning numbers')}
             </Link>
           </StyledCardContentInner>
@@ -129,20 +129,20 @@ const RabbitRow = styled.div`
   flex-direction: row;
 
   @media (max-width: 768px) {
-    display: none;
+    display: none !important;
   }
 `
 
-const RabbitRowSmall = styled.div`
-  margin-top: -2.3em;
-  align-items: center;
-  display: flex;
-  flex-direction: row;
+// const RabbitRowSmall = styled.div`
+//   margin-top: -2.3em;
+//   align-items: center;
+//   display: flex;
+//   flex-direction: row;
 
-  @media (min-width: 768px) {
-    display: none;
-  }
-`
+//   @media (min-width: 768px) {
+//     display: none;
+//   }
+// `
 
 const CardImage = styled.div`
   text-align: center;
