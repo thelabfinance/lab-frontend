@@ -72,13 +72,13 @@ const TotalPrizesCard = () => {
         <CardHeading>
           <Left>
             <IconWrapper>
-              <PancakeRoundIcon />
+              <object type="image/svg+xml" data="images/farms/minimal/labo.svg" width="42px">&nbsp;</object>
             </IconWrapper>
             <PrizeCountWrapper>
               <Text fontSize="14px" color="textSubtle">
                 {TranslateString(999, 'Total Pot:')}
               </Text>
-              <Heading size="lg">{lotteryPrizeWithCommaSeparators} CAKE</Heading>
+              <Heading size="lg">{lotteryPrizeWithCommaSeparators} LABO</Heading>
             </PrizeCountWrapper>
           </Left>
           <Right>

@@ -7,7 +7,7 @@ import { getLotteryIssueIndex } from 'utils/lotteryUtils'
 import useI18n from 'hooks/useI18n'
 import { useLottery } from 'hooks/useContract'
 import Page from 'components/layout/Page'
-import Hero from './components/Hero'
+import HowItWorks from './components/HowItWorks'
 import Divider from './components/Divider'
 import NextDrawPage from './NextDrawPage'
 import PastDrawsPage from './PastDrawsPage'
@@ -18,6 +18,16 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
+`
+const SvgHero = styled.div`
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  padding: 42px 12px;
+
+  @media all and (max-width: 1350px) { 
+    max-width: 100%;
+  }
 `
 
 const Lottery: React.FC = () => {
@@ -59,7 +69,10 @@ const Lottery: React.FC = () => {
 
   return (
     <>
-      <Hero />
+      <SvgHero>
+        <object type="image/svg+xml" data="images/lotteryhero.svg" width="810px">&nbsp;</object>
+      </SvgHero>
+      {/* <HowItWorks /> */}
       <Page>
         <Wrapper>
           <ButtonMenu activeIndex={activeIndex} onClick={handleClick} size="sm" variant="subtle">

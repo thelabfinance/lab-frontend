@@ -9,7 +9,7 @@ import UnlockWalletCard from './components/UnlockWalletCard'
 import TicketCard from './components/TicketCard'
 import TotalPrizesCard from './components/TotalPrizesCard'
 import WinningNumbers from './components/WinningNumbers'
-import HowItWorks from './components/HowItWorks'
+import Hero from './components/Hero'
 
 const Cards = styled(BaseLayout)`
   align-items: start;
@@ -45,6 +45,7 @@ const NextDrawPage: React.FC = () => {
 
   return (
     <>
+      <Hero />
       <Cards>
         <div>
           <TotalPrizesCard />
@@ -60,7 +61,6 @@ const NextDrawPage: React.FC = () => {
           )}
         </SecondCardColumnWrapper>
       </Cards>
-      <HowItWorks />
       {/* legacy page content */}
       <WinningNumbers />
     </>

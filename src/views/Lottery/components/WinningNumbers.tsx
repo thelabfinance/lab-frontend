@@ -38,45 +38,45 @@ const WinningNumbers: React.FC = () => {
             </Row>
             <RabbitRow>
               <RabbitBox>
-                <CardImageFirst>
-                  <Image src="/images/sign bunny 1@2x.png" alt="Number 1" width={200} height={150} responsive />
-                </CardImageFirst>
-              </RabbitBox>
-              <RabbitBox>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 2@2x.png" alt="Number 2" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 1" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBox>
               <RabbitBox>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 3@2x.png" alt="Number 3" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 2" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBox>
               <RabbitBox>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 4@2x.png" alt="Number 4" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 3" width={200} height={150} responsive />
+                </CardImage>
+              </RabbitBox>
+              <RabbitBox>
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 4" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBox>
             </RabbitRow>
             <RabbitRowSmall>
               <RabbitBoxSmall>
-                <CardImageFirst>
-                  <Image src="/images/sign bunny 1@2x.png" alt="Number 1" width={200} height={150} responsive />
-                </CardImageFirst>
-              </RabbitBoxSmall>
-              <RabbitBoxSmall>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 2@2x.png" alt="Number 2" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 1" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBoxSmall>
               <RabbitBoxSmall>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 3@2x.png" alt="Number 3" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 2" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBoxSmall>
               <RabbitBoxSmall>
-                <CardImage style={{ marginLeft: '-1.2em' }}>
-                  <Image src="/images/sign bunny 4@2x.png" alt="Number 4" width={200} height={150} responsive />
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 3" width={200} height={150} responsive />
+                </CardImage>
+              </RabbitBoxSmall>
+              <RabbitBoxSmall>
+                <CardImage>
+                  <Image src="/images/hydroUtil.svg" alt="Number 4" width={200} height={150} responsive />
                 </CardImage>
               </RabbitBoxSmall>
             </RabbitRowSmall>
@@ -185,7 +185,7 @@ const CenteredTextWithPadding = styled.div`
 const TicketNumberBox = styled.div`
   padding: 10px;
   border-radius: 12px;
-  background: linear-gradient(180deg, #54dade 0%, #24c7d6 76.22%);
+  background: linear-gradient(45deg, #c5c5ff 0%, #c5c4f2 76.22%);
   color: white;
   font-size: 20px;
   font-weight: 900;
