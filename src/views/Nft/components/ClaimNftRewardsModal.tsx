@@ -155,6 +155,11 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
   })
   if (process.env.REACT_APP_DEBUG === "true") console.log(balances, 'testing balances in modal')
 
+  const [orderedBalances, setOrdersBalances] = useState(balances);
+  useEffect(()=> {
+    setOrdersBalances(balances.sort((a, b) => a.tokenSymbol.toLowerCase() > b.tokenSymbol.toLowerCase() ? 1 : -1  ))
+  }, [balances])
+
   const UpdateComponent = useForceUpdate()
 
   const handleClaim = async (address) => {
@@ -371,7 +376,7 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
           </Tabs>
           <InfoFooter>
             <p>
-            <FaInfoCircle style={{'maxHeight': '12px'}} /> balances in dollar are an estimation.
+            {/* <FaInfoCircle style={{'maxHeight': '12px'}} /> balances in dollar are an estimation. */}
             </p>
           </InfoFooter>
         </ModalContent>
@@ -570,9 +575,9 @@ const ClaimNftRewardsModal: React.FC<ClaimNftRewardsModalProps> = ({ nft, balanc
             </Tab>
           </Tabs>
           <InfoFooter>
-            <p>
+            {/* <p>
             <FaInfoCircle style={{'maxHeight': '12px'}} /> balances in dollar are not fully accurate due to rapidly changing prices
-            </p>
+            </p> */}
           </InfoFooter>
         </ModalContent>
       </Modal>
