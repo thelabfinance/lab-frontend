@@ -1,17 +1,20 @@
 import React, { createContext, ReactNode, useEffect, useRef, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useWallet } from '@binance-chain/bsc-use-wallet'
-import useBlock from 'hooks/useBlock'
+// import useBlock from 'hooks/useBlock'
 import rabbitmintingfarm from 'config/abi/rabbitmintingfarm.json'
 import Nft, { RABBIT_MINTING_FARM_ADDRESS, rewardsPools } from 'config/constants/nfts'
 import multicall from 'utils/multicall'
-import { getPancakeRabbitContract, getRewardSplitterContract, getDevFeeProcessorContract, getNftSaleContract } from '../utils/contracts'
+import {
+  getPancakeRabbitContract,
+  getRewardSplitterContract,
+  getDevFeeProcessorContract,
+  getNftSaleContract,
+} from '../utils/contracts'
 
 interface NftProviderProps {
   children: ReactNode
 }
-
-
 
 type BunnyMap = {
   [key: number]: number[]
@@ -23,21 +26,26 @@ type OwnerMap = {
 
 type BalancesMap = {
   [key: number]: string[]
-} 
+}
 
 type PricesMap = {
   [key: string]: unknown
 }
 
 type TradingData = {
-  [key: number]: string[]
+  [key: number]: TradingDataItem
+}
+
+export type TradingDataItem = {
+  ownerPrice: number
+  isOnSale: boolean
+  highestBid: number
+  highestBidder: string
 }
 
 type ApprovedMap = {
   [key: number]: string[]
 }
-
-
 
 type State = {
   isInitialized: boolean
@@ -54,20 +62,17 @@ type State = {
   approvedMap: ApprovedMap
 }
 
- 
-
 type Context = {
   canBurnNft: boolean
   getTokenIds: (bunnyId: number) => number[]
   ownerOf: (bunnyId: number) => string[]
   getBalances: (bunnyId: number) => string[]
-  getTradingData: (bunnyId: number) => string[]
+  getTradingData: (bunnyId: number) => TradingDataItem
   getApproved: (bunnyId: number) => string[]
   reInitialize: () => void
   account: string
   rewardsPools: Record<string, unknown>
 } & State
-
 
 export const NftProviderContext = createContext<Context | null>(null)
 const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
@@ -84,13 +89,13 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
     ownerMap: {},
     balancesMap: {},
     tradingData: {},
-    approvedMap: {}
+    approvedMap: {},
   })
   const { account } = useWallet()
-  const currentBlock = useBlock()
+  // const currentBlock = useBlock()
 
   const { isInitialized } = state
-  
+
   const getNftData = async () => {
     const nftData = await fetch('https://us-central1-thelabfinance-f96f8.cloudfunctions.net/readNftData')
     const response = nftData.json()
@@ -98,270 +103,75 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
     return response
   }
 
-  const getPrices = async () =>{
+  const getPrices = async () => {
     // GET PRICES
     const baseUrl = 'https://fierce-crag-19051.herokuapp.com/https://api.pancakeswap.com/api/v1'
     const response = await fetch(`${baseUrl}/stat`)
     const responsedata = await response.json()
-    const laboWbnbPrice = responsedata.trade_pairs.filter((pair)=>{
-      if (
-        pair.base_symbol === 'LABO' && pair.quote_symbol === 'WBNB'
-      ){
+    const laboWbnbPrice = responsedata.trade_pairs.filter((pair) => {
+      if (pair.base_symbol === 'LABO' && pair.quote_symbol === 'WBNB') {
         return pair
       }
       return null
     })
-    const laboBusdPrice = responsedata.trade_pairs.filter((pair)=>{
-      if (
-        pair.base_symbol === 'LABO' && pair.quote_symbol === 'BUSD'
-      ){
+    const laboBusdPrice = responsedata.trade_pairs.filter((pair) => {
+      if (pair.base_symbol === 'LABO' && pair.quote_symbol === 'BUSD') {
         return pair
       }
       return null
     })
-    const wbnbBusdPrice = ( laboWbnbPrice.length && laboBusdPrice.length ? laboBusdPrice[0].last_price / laboWbnbPrice[0].last_price : 0 )
+    const wbnbBusdPrice =
+      laboWbnbPrice.length && laboBusdPrice.length ? laboBusdPrice[0].last_price / laboWbnbPrice[0].last_price : 0
     const pricesMap: PricesMap = {}
     pricesMap.WBNB = wbnbBusdPrice
     pricesMap.BUSD = 1
     pricesMap.USDT = 1
-    const pricesList = responsedata.trade_pairs.filter((pair)=>{
 
-      // TOKEN - BUSD
+    const SINGLE_TOKENS = ['DOT','CAKE','ADA','BTCB','EGG','WBNB','LABO','BUSD','AUTO','ETH','DAI','USDC','BSCX']
 
-      if ( 
-        (
-          pair.base_symbol === 'DOT' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'Cake' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'ADA' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'BTCB' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'EGG' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'WBNB' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'LABO' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'BUSD' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'AUTO' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'ETH' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'DAI' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'USDC' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'BSCX' && pair.quote_symbol === 'BUSD'
-        ) ||
-        (
-          pair.base_symbol === 'LABO' && pair.quote_symbol === 'BUSD'
-        ) 
-      ){
-        return pair
-      } 
+    const pricesList = responsedata.trade_pairs
+      .filter((pair) => {
 
-       // BUSD - TOKEN
-
-      if ( 
-        (
-          pair.quote_symbol === 'DOT' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'Cake' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'ADA' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'BTCB' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'EGG' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'WBNB' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'LABO' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'BUSD' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'AUTO' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'ETH' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'DAI' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'USDC' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'BSCX' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'LABO' && pair.base_symbol === 'BUSD'
-        ) 
-      ){
-        return pair
-       } 
-
-      // TOKEN - WBNB
-
-      if ( 
-        (
-          pair.base_symbol === 'DOT' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'Cake' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'ADA' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'BTCB' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'EGG' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'WBNB' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'LABO' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'BUSD' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'AUTO' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'ETH' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'DAI' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'USDC' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'BSCX' && pair.quote_symbol === 'WBNB'
-        ) ||
-        (
-          pair.base_symbol === 'LABO' && pair.quote_symbol === 'WBNB'
-        ) 
-      ){
-        return pair
-       } 
-      
-
-       // WBNB - TOKEN
-
-      if ( 
-        (
-          pair.quote_symbol === 'DOT' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'Cake' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'ADA' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'BTCB' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'EGG' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'WBNB' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'LABO' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'BUSD' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'AUTO' && pair.base_symbol === 'WBNB'
-        ) ||
-        (
-          pair.quote_symbol === 'ETH' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'DAI' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'USDC' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'BSCX' && pair.base_symbol === 'BUSD'
-        ) ||
-        (
-          pair.quote_symbol === 'LABO' && pair.base_symbol === 'BUSD'
-        ) 
-      ){
-        return pair
-       } 
-      
-      return null 
-    }).map((pair)=>{
-      if( pair.quote_symbol === 'BUSD' ){
-        const baseToken = pair.base_symbol
-        const tokenPrice = pair.last_price
-        return {
-          baseToken,
-          tokenPrice
+        if(pair.quote_symbol === 'BUSD' && SINGLE_TOKENS.includes(pair.base_symbol) || 
+        pair.base_symbol === 'BUSD' && SINGLE_TOKENS.includes(pair.quote_symbol) || 
+        pair.quote_symbol === 'WBNB' && SINGLE_TOKENS.includes(pair.base_symbol) || 
+        pair.base_symbol === 'WBNB' && SINGLE_TOKENS.includes(pair.quote_symbol) ){
+          return pair
         }
-      }
-      if( pair.quote_symbol === 'WBNB' ){
-        const baseToken = pair.base_symbol
-        const tokenPrice = pair.last_price*wbnbBusdPrice
-        return {
-          baseToken,
-          tokenPrice
+        return null;
+
+      })
+      .map((pair) => {
+        if (pair.quote_symbol === 'BUSD') {
+          return {
+            baseToken:pair.base_symbol,
+            tokenPrice:pair.last_price
+          }
         }
-      }
-      if( pair.base_symbol === 'BUSD'){
-        const baseToken = pair.quote_symbol
-        const tokenPrice = 1/pair.last_price
-        return {
-          baseToken,
-          tokenPrice
+        if (pair.quote_symbol === 'WBNB') {
+          return {
+            baseToken:pair.base_symbol,
+            tokenPrice: pair.last_price * wbnbBusdPrice
+          }
         }
-      }
-      if( pair.base_symbol === 'WBNB' && pair.quote_symbol !== 'BUSD' ){
-        const baseToken = pair.quote_symbol
-        const tokenPrice = 1/(pair.last_price*wbnbBusdPrice)
-        return {
-          baseToken,
-          tokenPrice
+        if (pair.base_symbol === 'BUSD') {
+          return {
+            baseToken: pair.quote_symbol,
+            tokenPrice: 1 / pair.last_price
+          }
         }
-      }
-      return null
-    }).map((pair)=>{
-      pricesMap[pair.baseToken.toUpperCase()] = pair.tokenPrice
-      return pair
-    })
+        if (pair.base_symbol === 'WBNB' && pair.quote_symbol !== 'BUSD') {
+          return {
+            baseToken: pair.quote_symbol,
+            tokenPrice: 1 / (pair.last_price * wbnbBusdPrice)
+          }
+        }
+        return null
+      })
+      .map((pair) => {
+        pricesMap[pair.baseToken.toUpperCase()] = pair.tokenPrice
+        return pair
+      })
 
     return pricesMap
   }
@@ -369,7 +179,6 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
   // Static data
   useEffect(() => {
     const fetchContractData = async () => {
-      
       const rewardSplitterContract = getRewardSplitterContract()
       const devFeeProcessorContract = getDevFeeProcessorContract()
       const nftSaleContract = getNftSaleContract()
@@ -378,55 +187,19 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
       let balancesMap: BalancesMap = {}
 
-
       // const priceOf = await getPrices()
 
-
-      // GET BALANCES ARRAY
-
-      // const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-      //   try {
-      //     const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-      //     const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
-      //     const nftRewards = (Number(totalRewards)*0.35)/50
-      //     const lpTokens = tokenSymbol.split('-')
-      //     // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-      //     //   priceOf[String(lpTokens[0])], 
-      //     //   priceOf[String(lpTokens[1])]
-      //     // ] )
-      //     // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-      //     // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-      //     // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-      //     // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
-    
-      //     return Object({
-      //       currency: tokenAddr,
-      //       balance,
-      //       // usdtBalance,
-      //       tokenSymbol,
-      //       isTokenOnly,
-      //       totalRewards,
-      //       // usdtTotalRewards,
-      //       nftRewards,
-      //       // usdtNftRewards
-      //     })
-      //   } catch (error) {
-      //     return 0
-      //   }
-      // }      
-
       const getBalanceCloud = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-        
-        const nftInstance = nftData.filter((nft)=>{
-          if (nft.nftId === bunnyId){
+        const nftInstance = nftData.filter((nft) => {
+          if (nft.nftId === bunnyId) {
             return nft
-          } 
+          }
           return null
         })[0]
 
         // const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-        const balanceInstance = nftInstance.balances.filter((balance)=>{
-          if (balance.address.toLowerCase() === tokenAddr.toLowerCase()){
+        const balanceInstance = nftInstance.balances.filter((balance) => {
+          if (balance.address.toLowerCase() === tokenAddr.toLowerCase()) {
             return balance
           }
           return null
@@ -438,74 +211,48 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
         // const nftRewards = (Number(totalRewards)*0.35)/50
         return {
-          currency: tokenAddr,
           nftInstance,
           balance,
           totalRewards,
           nftRewards,
           isTokenOnly,
-          tokenSymbol
+          tokenSymbol,
         }
       }
 
       const balancesPromises = []
       for (let i = 1; i <= Nft.length; i++) {
         const balancePromises = []
-        Object.keys(rewardsPools).forEach( async (key) => {
-          balancePromises.push(await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
-        } )
+        Object.keys(rewardsPools).forEach(async (key) => {
+            balancePromises.push(
+              await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly),
+            )
+          })
         balancesPromises.push(balancePromises)
       }
 
-      const balanceList = await Promise.all(balancesPromises)
-      balancesMap = balanceList
+      balancesMap = await Promise.all(balancesPromises)
 
       // GET TRADING DATA
 
       let tradingData: TradingData = {}
 
-      // const getTradingData = async (bunnyId: number) => {
-      //   try {
-      //     const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
-      //     const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
-      //     const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
-      //     const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
-      //     return Object({
-      //       OwnerPrice,
-      //       isOnSale,
-      //       highestBid,
-      //       highestBidder
-      //     })
-      //   } catch (error) {
-      //     if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
-      //     return 0
-      //   }
-      // }
-
       const getTradingDataCloud = async (bunnyId: number) => {
-        const nftInstance = nftData.filter((nft)=>{
-          if (nft.nftId === bunnyId){
+        const nftInstance = nftData.filter((nft) => {
+          if (nft.nftId === bunnyId) {
             return nft
-          } 
+          }
           return null
         })[0]
 
-        const tradingDataInstance = nftInstance.tradingData
+        const { ownerPrice, isOnSale, highestBid, highestBidder } = nftInstance.tradingData
 
-        const OwnerPrice = tradingDataInstance.ownerPrice
-        const isOnSale = tradingDataInstance.isOnSale
-        const highestBid = tradingDataInstance.highestBid
-        const highestBidder = tradingDataInstance.highestBidder
-        
-
-        return Object({
-          nftInstance,
-          OwnerPrice,
+        return {
+          ownerPrice,
           isOnSale,
           highestBid,
-          highestBidder
-        })
-       
+          highestBidder,
+        }
       }
 
       const tradingDataPromises = []
@@ -513,23 +260,19 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         tradingDataPromises.push(getTradingDataCloud(i))
       }
 
-      const tradingDataList = await Promise.all(tradingDataPromises)
-      tradingData = tradingDataList
+      tradingData = await Promise.all(tradingDataPromises)
 
-      if (process.env.REACT_APP_DEBUG === "true") console.log(tradingData, 'klk trading data')
-
+      if (process.env.REACT_APP_DEBUG === 'true') console.log(tradingData, 'klk trading data')
 
       setState((prevState) => ({
         ...prevState,
         balancesMap,
-        tradingData
+        tradingData,
       }))
-
     }
 
     fetchContractData()
-  }, [isInitialized, setState])
-
+  }, [isInitialized])
 
   // Data from the contract that needs an account
   useEffect(() => {
@@ -542,13 +285,11 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
 
         const nftData = await getNftData()
 
-        if (process.env.REACT_APP_DEBUG === "true") console.log([
-          pancakeRabbitsContract,
-          rewardSplitterContract,
-          devFeeProcessorContract,
-          nftSaleContract
-        ], 'contracts')
-        
+        if (process.env.REACT_APP_DEBUG === 'true')
+          console.log(
+            [pancakeRabbitsContract, rewardSplitterContract, devFeeProcessorContract, nftSaleContract],
+            'contracts',
+          )
 
         // DECLARE MAPPING OBJECTS
 
@@ -557,33 +298,17 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         let balancesMap: BalancesMap = {}
         let approvedMap: ApprovedMap = {}
 
-
-        // GET OWNER ARRAY
-
-        // const getOwnerOf = async (bunnyId: number) => {
-        //   try {
-        //     const ownerOf = await pancakeRabbitsContract.methods.ownerOf(bunnyId).call()
-        //     if (process.env.REACT_APP_DEBUG === "true") console.log(ownerOf, 'owner of')
-        //     return ownerOf
-        //   } catch (error) {
-        //     if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
-        //     return ""
-        //   }
-        // }
-        
         const getOwnerOfCloud = async (bunnyId: number) => {
-          const nftInstance = nftData.filter((nft)=>{
-            if (nft.nftId === bunnyId){
+          const nftInstance = nftData.filter((nft) => {
+            if (nft.nftId === bunnyId) {
               return nft
-            } 
+            }
             return null
           })[0]
 
-          const governanceDataInstance = nftInstance.governanceData
-
-          const ownerOf = governanceDataInstance.ownerOf
-
-          return ownerOf
+          return nftInstance && nftInstance.governanceData && nftInstance.governanceData.ownerOf
+            ? nftInstance.governanceData.ownerOf
+            : undefined
         }
 
         const ownersPromises = []
@@ -594,36 +319,19 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const ownersList = await Promise.all(ownersPromises)
         ownerMap = ownersList
 
-        if (process.env.REACT_APP_DEBUG === "true") console.log(ownerMap, 'owner map')
-
-        // GET APPROVED ARRAY
-
-        // const getApprovedFor = async (bunnyId: number) => {
-        //   try {
-        //     const approvedFor = await pancakeRabbitsContract.methods.getApproved(bunnyId).call()
-        //     if (process.env.REACT_APP_DEBUG === "true") console.log(approvedFor, `approved for ${bunnyId}`)
-        //     return approvedFor
-        //   } catch (error) {
-        //     if (process.env.REACT_APP_DEBUG === "true") console.log('owner')
-        //     return ""
-        //   }
-        // }      
-        // if (process.env.REACT_APP_DEBUG === "true") console.log('heeey')
-    
+        if (process.env.REACT_APP_DEBUG === 'true') console.log(ownerMap, 'owner map')
 
         const getApprovedForCloud = async (bunnyId: number) => {
-          const nftInstance = nftData.filter((nft)=>{
-            if (nft.nftId === bunnyId){
+          const nftInstance = nftData.filter((nft) => {
+            if (nft.nftId === bunnyId) {
               return nft
-            } 
+            }
             return null
           })[0]
 
-          const approvedDataInstance = nftInstance.approvedData
-
-          const approvedFor = approvedDataInstance.approvedFor
-
-          return approvedFor
+          return nftInstance && nftInstance.approvedData && nftInstance.approvedData.ownerOf
+            ? nftInstance.approvedData.ownerOf
+            : undefined
         }
 
         const approvedPromises = []
@@ -634,151 +342,89 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
         const approvedList = await Promise.all(approvedPromises)
         approvedMap = approvedList
 
-        if (process.env.REACT_APP_DEBUG === "true") console.log(approvedMap, 'approved map')
-
+        if (process.env.REACT_APP_DEBUG === 'true') console.log(approvedMap, 'approved map')
 
         // GET BALANCES ARRAY
 
         // const priceOf = await getPrices()
 
-        const getBalanceCloud = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-        
-          const nftInstance = nftData.filter((nft)=>{
-            if (nft.nftId === bunnyId){
+        const getBalanceCloud = async (
+          bunnyId: number,
+          tokenAddr: string,
+          tokenSymbol: string,
+          isTokenOnly: boolean,
+        ) => {
+          const nftInstance = nftData.filter((nft) => {
+            if (nft.nftId === bunnyId) {
               return nft
-            } 
+            }
             return null
           })[0]
-  
+
           // const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-          const balanceInstance = nftInstance.balances.filter((balance)=>{
-            if (balance.address.toLowerCase() === tokenAddr.toLowerCase()){
+          const balanceInstance = nftInstance.balances.filter((balance) => {
+            if (balance.address.toLowerCase() === tokenAddr.toLowerCase()) {
               return balance
             }
             return null
           })[0]
-  
+
           const balance = balanceInstance.balance
           const totalRewards = balanceInstance.totalRewards
           const nftRewards = balanceInstance.nftRewards
           // const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
           // const nftRewards = (Number(totalRewards)*0.35)/50
           return {
-            currency: tokenAddr,
             nftInstance,
             balance,
             totalRewards,
             nftRewards,
             isTokenOnly,
-            tokenSymbol
+            tokenSymbol,
           }
         }
-
-        // const getBalance = async (bunnyId: number, tokenAddr: string, tokenSymbol: string, isTokenOnly: boolean) => {
-        //   try {
-        //     const balance = await rewardSplitterContract.methods.getBalance(tokenAddr, bunnyId).call()
-        //     const totalRewards = await devFeeProcessorContract.methods.tokenBalance(tokenAddr).call()
-        //     const nftRewards = (Number(totalRewards)*0.35)/50
-        //     const lpTokens = tokenSymbol.split('-')
-        //     // const usdtPrice = ( isTokenOnly ? priceOf[String(lpTokens[0])] : [
-        //     //   priceOf[String(lpTokens[0])], 
-        //     //   priceOf[String(lpTokens[1])]
-        //     // ] )
-        //     // console.log(`${usdtPrice} usdt price of ${tokenSymbol}`)
-        //     // const usdtBalance = ( isTokenOnly ? Number(balance)*Number(priceOf[tokenSymbol]) : Number(balance)*Number(priceOf[lpTokens[0]]) + Number(balance)*Number(priceOf[lpTokens[1]]))
-        //     // const usdtTotalRewards = ( isTokenOnly ? Number(totalRewards)*Number(priceOf[tokenSymbol]) : Number(totalRewards)*Number(priceOf[lpTokens[0]]) + Number(totalRewards)*Number(priceOf[lpTokens[1]]))
-        //     // const usdtNftRewards = ( isTokenOnly ? Number(nftRewards)*Number(priceOf[tokenSymbol]) : Number(nftRewards)*Number(priceOf[lpTokens[0]]) + Number(nftRewards)*Number(priceOf[lpTokens[1]]))
-            
-      
-        //     return Object({
-        //       currency: tokenAddr,
-        //       balance,
-        //       // usdtBalance,
-        //       tokenSymbol,
-        //       isTokenOnly,
-        //       totalRewards,
-        //       // usdtTotalRewards,
-        //       nftRewards,
-        //       // usdtNftRewards
-        //     })
-        //   } catch (error) {
-        //     return 0
-        //   }
-        // }      
 
         const balancesPromises = []
         for (let i = 1; i <= Nft.length; i++) {
           const balancePromises = []
-          Object.keys(rewardsPools).forEach( async (key) => {
-            balancePromises.push(await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly))
-          } )
+          Object.keys(rewardsPools).forEach(async (key) => {
+            balancePromises.push(
+              await getBalanceCloud(i, rewardsPools[key].address, key, rewardsPools[key].isTokenOnly),
+            )
+          })
           balancesPromises.push(balancePromises)
         }
 
-        const balanceList = await Promise.all(balancesPromises)
-        balancesMap = balanceList
+        balancesMap = await Promise.all(balancesPromises)
 
         // GET TRADING DATA
 
-      let tradingData: TradingData = {}
+        let tradingData: TradingData = {}
 
-      const getTradingDataCloud = async (bunnyId: number) => {
-        const nftInstance = nftData.filter((nft)=>{
-          if (nft.nftId === bunnyId){
-            return nft
-          } 
-          return null
-        })[0]
+        const getTradingDataCloud = async (bunnyId: number) => {
+          const nftInstance = nftData.filter((nft) => {
+            if (nft.nftId === bunnyId) {
+              return nft
+            }
+            return null
+          })[0]
 
-        const tradingDataInstance = nftInstance.tradingData
+          const { ownerPrice, isOnSale, highestBid, highestBidder } = nftInstance.tradingData
 
-        const OwnerPrice = tradingDataInstance.ownerPrice
-        const isOnSale = tradingDataInstance.isOnSale
-        const highestBid = tradingDataInstance.highestBid
-        const highestBidder = tradingDataInstance.highestBidder
+          return {
+            ownerPrice,
+            isOnSale,
+            highestBid,
+            highestBidder,
+          }
+        }
 
-        const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
+        const tradingDataPromises = []
+        for (let i = 1; i <= Nft.length; i++) {
+          tradingDataPromises.push(getTradingDataCloud(i))
+        }
 
-        return Object({
-          nftInstance,
-          OwnerPrice,
-          isOnSale,
-          highestBid,
-          highestBidder,
-          userBid
-        })
-       
-      }
-
-      // const getTradingData = async (bunnyId: number) => {
-      //   try {
-      //     const OwnerPrice = await nftSaleContract.methods.getPrice(bunnyId).call()
-      //     const isOnSale = await nftSaleContract.methods.isOnSale(bunnyId).call()
-      //     const highestBid = await nftSaleContract.methods.getHighestBid(bunnyId).call()
-      //     const highestBidder = await nftSaleContract.methods.perTokenBids(bunnyId).call()
-      //     const userBid = await nftSaleContract.methods.getBidBy(bunnyId, account).call()
-
-      //     if (process.env.REACT_APP_DEBUG === "true") console.log(`${userBid} usser bid for nft ${bunnyId}`)
-      //     return Object({
-      //       OwnerPrice,
-      //       isOnSale,
-      //       highestBid,
-      //       highestBidder,
-      //       userBid
-      //     })
-      //   } catch (error) {
-      //     if (process.env.REACT_APP_DEBUG === "true") console.log(error, nftSaleContract, 'klk')
-      //     return 0
-      //   }
-      // }
-
-      const tradingDataPromises = []
-      for (let i = 1; i <= Nft.length; i++) {
-        tradingDataPromises.push(getTradingDataCloud(i))
-      }
-
-      const tradingDataList = await Promise.all(tradingDataPromises)
-      tradingData = tradingDataList
+        tradingData = await Promise.all(tradingDataPromises)
 
         // SET STATE FOR ALL
 
@@ -790,7 +436,6 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
           approvedMap,
         }))
 
-
         // If the "balanceOf" is greater than 0 then retrieve the tokenIds
         // owned by the wallet, then the bunnyId's associated with the tokenIds
         const balanceOf = 1
@@ -799,7 +444,8 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             try {
               const tokenId = await pancakeRabbitsContract.methods.tokenOfOwnerByIndex(account, index).call()
               const bunnyId = await pancakeRabbitsContract.methods.getBunnyId(tokenId).call()
-              if (process.env.REACT_APP_DEBUG === "true") console.log(`${tokenId} token ID and ${bunnyId} bunny ID of account: ${account}`)
+              if (process.env.REACT_APP_DEBUG === 'true')
+                console.log(`${tokenId} token ID and ${bunnyId} bunny ID of account: ${account}`)
 
               return [parseInt(bunnyId, 10), parseInt(tokenId, 10)]
             } catch (error) {
@@ -807,9 +453,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
             }
           }
 
-
           const tokenIdPromises = []
-          
 
           for (let i = 0; i < balanceOf; i++) {
             tokenIdPromises.push(getTokenIdAndBunnyId(i))
@@ -847,7 +491,7 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
     if (account) {
       fetchContractData()
     }
-  }, [isInitialized, account, setState])
+  }, [isInitialized, account])
 
   useEffect(() => {
     return () => {
@@ -855,12 +499,12 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
     }
   }, [isMounted])
 
-  const canBurnNft = currentBlock <= state.endBlockNumber
+  const canBurnNft = false; // currentBlock <= state.endBlockNumber
   const getTokenIds = (bunnyId: number) => state.bunnyMap[bunnyId]
-  const ownerOf = (bunnyId: number) => state.ownerMap[bunnyId-1]
-  const getBalances = (bunnyId: number) => state.balancesMap[bunnyId-1]
-  const getTradingData = (bunnyId: number) => state.tradingData[bunnyId-1]
-  const getApproved = (bunnyId: number) => state.approvedMap[bunnyId-1]
+  const ownerOf = (bunnyId: number) => state.ownerMap[bunnyId - 1]
+  const getBalances = (bunnyId: number) => state.balancesMap[bunnyId - 1]
+  const getTradingData = (bunnyId: number) => state.tradingData[bunnyId - 1]
+  const getApproved = (bunnyId: number) => state.approvedMap[bunnyId - 1]
 
   /**
    * Allows consumers to re-fetch all data from the contract. Triggers the effects.
@@ -876,7 +520,20 @@ const NftProvider: React.FC<NftProviderProps> = ({ children }) => {
   }
 
   return (
-    <NftProviderContext.Provider value={{ ...state, canBurnNft, getTokenIds, ownerOf, getBalances, getTradingData, getApproved, rewardsPools, reInitialize, account }}>
+    <NftProviderContext.Provider
+      value={{
+        ...state,
+        canBurnNft,
+        getTokenIds,
+        ownerOf,
+        getBalances,
+        getTradingData,
+        getApproved,
+        rewardsPools,
+        reInitialize,
+        account,
+      }}
+    >
       {children}
     </NftProviderContext.Provider>
   )
