@@ -180,6 +180,11 @@ const NavBar = (props) => {
                               NFTs
                             </Link>
                           </li>
+                          <li className="nav-tab">
+                            <Link to="/lottery" className="nav-links" onClick={()=>{setIsChecked(!isChecked)}}>
+                              LOTTO
+                            </Link>
+                          </li>
                           <li className="nav-tab dropdown" id="infoToggleDesktop">
                             <Link to="/" className="nav-links" onClick={()=>{setIsChecked(!isChecked)}}>
                               INFO

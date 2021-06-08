@@ -44,7 +44,7 @@ export const rewardsPools ={
   'isTokenOnly': false
   },
   'ADA-WBNB':	{
-  'address':'0x0eD7e52944161450477ee417DE9Cd3a859b14fD0',
+  'address':'0x28415ff2C35b65B9E5c7de82126b4015ab9d031F',
   'isTokenOnly': false
   },
   'LABO': {

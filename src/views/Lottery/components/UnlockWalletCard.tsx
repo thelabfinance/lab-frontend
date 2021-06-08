@@ -21,6 +21,11 @@ const IconWrapper = styled.div`
     height: 80px;
   }
 `
+const LaboTicketIcon: React.FC<any> = () => (
+  <div style={{width: '86px', display: 'flex', flexFlow: 'row', 'justifyContent': 'center'}}>
+    <object type="image/svg+xml" data="images/mobileUtil.svg" width="72px">&nbsp;</object>
+  </div>
+)
 
 const UnlockWalletCard = () => {
   const TranslateString = useI18n()
@@ -29,7 +34,7 @@ const UnlockWalletCard = () => {
     <Card isActive>
       <StyledCardBody>
         <IconWrapper>
-          <Ticket />
+          <LaboTicketIcon />
         </IconWrapper>
         <StyledHeading size="md">{TranslateString(999, 'Unlock wallet to access lottery')}</StyledHeading>
         <UnlockButton />

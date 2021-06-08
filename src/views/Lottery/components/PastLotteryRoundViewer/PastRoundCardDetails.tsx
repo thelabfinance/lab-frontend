@@ -12,6 +12,18 @@ interface PastRoundCardDetailsProps {
   data: DataResponse
 }
 
+const LaboRoundIcon: React.FC<any> = () =>  (
+  <div style={{width: '86px', display: 'flex', flexFlow: 'row', 'justifyContent': 'center'}}>
+    <object type="image/svg+xml" data="images/farms/minimal/labo.svg" width="42px">&nbsp;</object>
+  </div>
+)
+
+const LaboTicketIcon: React.FC<any> = () => (
+  <div style={{width: '86px', display: 'flex', flexFlow: 'row', 'justifyContent': 'center'}}>
+    <object type="image/svg+xml" data="images/mobileUtil.svg" width="72px">&nbsp;</object>
+  </div>
+)
+
 const CardHeading = styled.div`
   position: relative;
   display: flex;
@@ -49,13 +61,13 @@ const PastRoundCardDetails: React.FC<PastRoundCardDetailsProps> = ({ data }) => 
             </Heading>
             <TopLotteryCardHeading
               valueToDisplay={`${lotteryNumbers[0]}, ${lotteryNumbers[1]}, ${lotteryNumbers[2]}, ${lotteryNumbers[3]}`}
-              Icon={TicketRound}
+              Icon={LaboTicketIcon}
             >
               {TranslateString(999, 'Winning numbers')}
             </TopLotteryCardHeading>
             <LotteryCardHeading
-              valueToDisplay={TranslateString(999, `${poolSize.toLocaleString()} CAKE`)}
-              Icon={PancakeRoundIcon}
+              valueToDisplay={TranslateString(999, `${poolSize.toLocaleString()} LABO`)}
+              Icon={LaboRoundIcon}
             >
               {TranslateString(999, 'Total prizes')}
             </LotteryCardHeading>
