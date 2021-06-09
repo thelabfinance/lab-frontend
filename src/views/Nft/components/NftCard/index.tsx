@@ -1,6 +1,6 @@
-import React, { useState, useContext, useCallback } from 'react'
+import React, { useState, useContext, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import {
   Card,
   CardBody,
@@ -14,9 +14,10 @@ import {
   useModal,
 } from '@pancakeswap-libs/uikit'
 import useI18n from 'hooks/useI18n'
+import BigNumber from 'bignumber.js'
 import { Nft } from 'config/constants/types'
-import ReactCardFlip from 'react-card-flip';
-import LazyLoad from 'react-lazyload';
+import ReactCardFlip from 'react-card-flip'
+import LazyLoad from 'react-lazyload'
 import InfoRow from '../InfoRow'
 import Image from '../Image'
 import { NftProviderContext } from '../../contexts/NftProvider'
@@ -102,12 +103,11 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
     }
   }, [bunnyId])
 
-
   const openCard = async () => {
-      setState((prevState) => ({ ...prevState, isOpen: true }))
+    setState((prevState) => ({ ...prevState, isOpen: true }))
   }
   const closeCard = async () => {
-    setState((prevState) => ({ ...prevState, isOpen: false}))
+    setState((prevState) => ({ ...prevState, isOpen: false }))
   }
 
   const handleSuccess = () => {
@@ -122,79 +122,95 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
   )
 
   function getWindowDimensions() {
-    const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
+    const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window
     return {
       viewportWidth,
-      viewportHeight
-    };
+      viewportHeight,
+    }
   }
 
-  function showToggleButton(){
-    setState((prevState) => ({ ...prevState, showToggleButton: 1}))
+  function showToggleButton() {
+    setState((prevState) => ({ ...prevState, showToggleButton: 1 }))
   }
 
-  function hideToggleButton(){
-    setState((prevState) => ({ ...prevState, showToggleButton: 0}))
+  function hideToggleButton() {
+    setState((prevState) => ({ ...prevState, showToggleButton: 0 }))
   }
 
-  const {viewportWidth, viewportHeight} = getWindowDimensions()
-  
+  const { viewportWidth, viewportHeight } = getWindowDimensions()
+
   const webRender = () => {
     const webmBreakpoints = {
       lg: 1200,
       sm: 770,
     }
     if (viewportWidth >= webmBreakpoints.lg) {
-      return "lg"
+      return 'lg'
     }
-    if (viewportWidth < webmBreakpoints.lg && viewportWidth >= webmBreakpoints.sm){
-      return "md"
+    if (viewportWidth < webmBreakpoints.lg && viewportWidth >= webmBreakpoints.sm) {
+      return 'md'
     }
-    return "sm"
+    return 'sm'
   }
 
-  const balanceArray = Array(getBalances(nft.bunnyId))[0]
-  if (process.env.REACT_APP_DEBUG === "true") console.log(balanceArray, 'balances')
-  const laboBalance = ( balanceArray ? parseFloat(Object(balanceArray.filter(item => Object(item).tokenSymbol === "LABO")[0]).balance)/(10**18) : 0 )
+   const balanceArray = Array(getBalances(nft.bunnyId))[0]
+   if (process.env.REACT_APP_DEBUG === "true") console.log(balanceArray, 'balances')
+   const laboBalance = ( balanceArray ? parseFloat(Object(balanceArray.filter(item => Object(item).tokenSymbol === "LABO")[0]).balance)/(10**18) : 0 )
 
   const owner = String(ownerOf(nft.bunnyId))
-  const isOwned = owner === account 
-  const isOnSale = Object(getTradingData(nft.bunnyId)).isOnSale
+  const isOwned = owner === account
+  const tradingData = getTradingData(nft.bunnyId)
+  const { isOnSale, ownerPrice } = tradingData || { isOnSale: false, ownerPrice: undefined }
+  const ownerPriceBNB = new BigNumber(ownerPrice).shiftedBy(-18).toFixed(2)
 
   return (
     <ReactCardFlip isFlipped={state.isOpen}>
       <div className="nftCardImage" onMouseEnter={showToggleButton} onMouseLeave={hideToggleButton}>
         <LazyLoad offset={100}>
           <video autoPlay loop muted width="100%" className="nftCardFront">
-              <source src={`/images/nfts/webm/${webRender()}/${video.webm}`} type='video/webm' />
+            <source src={`/images/nfts/webm/${webRender()}/${video.webm}`} type="video/webm" />
           </video>
         </LazyLoad>
-        <Button onClick={openCard} className="cardFlipButton" style={{"borderRadius": "50%", "width": "37px", "height": "37px", "padding": "0", "position": "absolute", "opacity": `${state.showToggleButton}`, "transition": "opacity 6 linear", "top": "25px", "right": "25px"}}><FaEye style={{"fill": "white"}}/></Button>
+        <Button
+          onClick={openCard}
+          className="cardFlipButton"
+          style={{
+            borderRadius: '50%',
+            width: '37px',
+            height: '37px',
+            padding: '0',
+            position: 'absolute',
+            opacity: `${state.showToggleButton}`,
+            transition: 'opacity 6 linear',
+            top: '25px',
+            right: '25px',
+          }}
+        >
+          <FaEye style={{ fill: 'white' }} />
+        </Button>
       </div>
       <Card p="0" isActive={isOwned} className="nftCardBack" onMouseLeave={closeCard}>
         <CardBody p={32}>
+          {/*  Card Heading Start */}
 
-        {/*  Card Heading Start */}
-
-        <Header>
+          <Header>
             <Heading>{`${bunnyId}. ${name}`}</Heading>
             <div>
-            {isInitialized && isOwned && (
-              <Tag outline variant="binance">
-                Owned
-              </Tag>
-            )}
-            &nbsp;
-            &nbsp;
-            {( isOnSale ? (
-              <Tag outline variant="success">
-                On Sale
-              </Tag>
-            ):(
-              <Tag outline variant="failure">
-                Only Bidding
-              </Tag>
-            ))}
+              {isInitialized && isOwned && (
+                <Tag outline variant="binance">
+                  Owned
+                </Tag>
+              )}
+              &nbsp; &nbsp;
+              {isOnSale ? (
+                <Tag outline variant="success">
+                  On Sale {ownerPriceBNB} BNB
+                </Tag>
+              ) : (
+                <Tag outline variant="failure">
+                  Only Bidding
+                </Tag>
+              )}
             </div>
           </Header>
 
@@ -215,13 +231,15 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
           {/*  Card Info End */}
 
           {/*  Card Actions Start */}
-          
-          {!isOwned ? <BidderActions nft={nft} balances={balanceArray}/> : <OwnerActions nft={nft} balances={balanceArray}/>}
+
+          {!isOwned ? (
+            <BidderActions nft={nft} balances={balanceArray} />
+          ) : (
+            <OwnerActions nft={nft} balances={balanceArray} />
+          )}
 
           {/*  Card Actions End */}
-
-
-          </CardBody>
+        </CardBody>
       </Card>
     </ReactCardFlip>
   )
