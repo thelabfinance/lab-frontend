@@ -10,6 +10,7 @@ import CakeStats from './components/CakeStats'
 import TotalValueLockedCard from './components/TotalValueLockedCard'
 
 
+
 const Column = styled.div`
   column-count: 2;
   height: 100%;
